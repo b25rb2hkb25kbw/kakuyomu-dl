@@ -34,6 +34,7 @@ use strict;
 use warnings;
 use LWP::UserAgent;
 use HTML::TagParser;
+use HTML::Entities;
 use utf8;
 use Encode;
 use File::Basename;
@@ -126,13 +127,14 @@ sub last_update {
 # 作品名、著者名取得
 sub header {
     my $item = shift;
+	# print STDERR encode($charcode, $item);
     $item = &html2tree( $item );
-    my $main_title = $item->getElementsByClassName('widget-works-workHeader')
+    my $main_title = $item->getElementById('workHeader-inner')
                           ->subTree
                           ->getElementById('workTitle')
                           ->subTree
                           ->getElementsByTagName("a")->innerText;
-    my $author = $item->getElementsByClassName('widget-works-workHeader')
+    my $author = $item->getElementById('workHeader-inner')
                       ->subTree
                       ->getElementById('workAuthor')
                       ->subTree
@@ -150,13 +152,14 @@ sub honbun {
     $item =   $1;
     $item =~  s|(class="blank">)<br />|$1|g;
     $item =~  s|<br />|\n|g;
-    $item =~  s|<ruby>(.+?)<rt>(.+?)</rt></ruby>|｜$1《$2》|g;
+    $item =~  s|<ruby>(.+?)(<rp>(.+?)</rp>)?<rt>(.+?)</rt>(<rp>(.+?)</rp>)?</ruby>|｜$1《$4》|g;
     $item =~  s|<em>(.+?)</em>|［＃傍点］$1［＃傍点終わり］|g;
     $item =~  s|<.*?>||g;
     $item =~  s|^\s+$||gm;
     $item =~  s|！！|!!|g;
     $item =~  s|！？|!\?|g;
 #    $item =~ tr|\x{ff5e}|\x{301c}|; #全角チルダ->波ダッシュ
+	$item = decode_entities($item);
     return $item;
 }
 sub get_all {
