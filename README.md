@@ -22,6 +22,7 @@ kakuyomu-dl.pl
 ```
     LWP::UserAgent
     HTML::TagParser
+    HTML::Entities
     Term::ProgressBar
 ```
 
